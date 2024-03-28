@@ -1,20 +1,45 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { FlatList, ListRenderItem, SafeAreaView } from 'react-native';
+import { ClothingItem } from './types';
+import { ClothingCard } from './components/ClothingCard';
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+	const [data, setData] = useState<ClothingItem[]>();
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+	useEffect(() => {
+		const getData = async () => {
+			axios
+				.get('https://fakestoreapi.com/products')
+				.then((response) => {
+					setData(response.data);
+				})
+				.catch((error) => {
+					console.error(error);
+				});
+		};
+		getData();
+	}, []);
+
+	const Item = ({ item }: { item: ClothingItem }) => (
+		<ClothingCard id={item.id} title={item.title} key={item.id} />
+	);
+
+	const renderItem: ListRenderItem<ClothingItem> = ({ item }) => (
+		<Item item={item} />
+	);
+
+	return (
+		<SafeAreaView
+			style={{
+				flex: 1,
+			}}
+		>
+			<FlatList
+				data={data}
+				renderItem={renderItem}
+				keyExtractor={(item: ClothingItem) => item.id}
+			/>
+		</SafeAreaView>
+	);
+}
