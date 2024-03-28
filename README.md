@@ -1,0 +1,1 @@
+# rn-typed-flatlist
